@@ -6,29 +6,40 @@ Dica: a action do formulário deve chamar a mesma página.
 !-->
 
 <?php
-    $user = $_POST['user'];
+
+if (isset($_POST['login'])) {
+    $login = $_POST['login'];
     $password = $_POST['password'];
 
-    if ($user == 'ifpr' && $password == 'tads')
+    if ($login == 'ifpr' && $password == 'tads') {
         echo "Bem Vindo ao TADS";
-
+        $estaLogado = true;
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login</title>
 </head>
-<body>
-    <form action="" method="POST">
-        <input type="text" placeholder="Insira seu usuário" name="user">
-        <br><br>
-        <input type="password" placeholder="Insira sua senha" name="password">
-        <br><br>
-        <button type="submit">Enviar</button>
-    </form>
-</body>
-</html>
 
+<body>
+
+    <?php
+    if (! $estaLogado): ?>
+
+
+        <h4>Login!!!</h4>
+        <form action="" method="POST">
+            <input type="text" placeholder="Insira seu usuário" name="login" required>
+            <br><br>
+            <input type="password" placeholder="Insira sua senha" name="password" required>
+            <br><br>
+            <button type="submit">Enviar</button>
+        </form><?php endif; ?>
+</body>
+
+</html>
