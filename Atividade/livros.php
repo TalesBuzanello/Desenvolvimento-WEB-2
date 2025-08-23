@@ -29,6 +29,9 @@ if (isset($_POST["titulo"])){
 
     salvarDados($livros, "livros.json");
 
+    //Força o recarregamento para evitar o reenvio do formulário
+    header("location: livros.php");
+
 }
 
 ?>
@@ -84,7 +87,9 @@ if (isset($_POST["titulo"])){
             <td><?= $l['titulo'] ?></td>
             <td><?= $l['genero'] ?></td>
             <td><?= $l['paginas'] ?></td>
-            <td></td>
+            <td>
+                <a href="excluir.php?id=<?= $l['id']?>">Excluir</a>
+            </td>
         </tr>
 
     <?php endforeach; ?>
