@@ -88,7 +88,9 @@ if (isset($_POST["titulo"])){
             <td><?= $l['genero'] ?></td>
             <td><?= $l['paginas'] ?></td>
             <td>
-                <a href="excluir.php?id=<?= $l['id']?>">Excluir</a>
+                <a href="excluir.php?id=<?= $l['id']?>"
+                onclick="return confirm('Confirma a exclusão?')"
+                >Excluir</a>
             </td>
         </tr>
 
