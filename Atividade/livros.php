@@ -8,30 +8,58 @@ include_once("persistencia.php");
 $livros = buscarDados("livros.json");
 //print_r($livros);
 
-if (isset($_POST["titulo"])){
+$msgErro = "";
+$titulo = "";
+$autor = "";
+$numPaginas = "";
+$genero = "";
 
-    $titulo = $_POST["titulo"];
-    $genero = $_POST["genero"];
-    $numPaginas = $_POST["numPaginas"];
+if (isset($_POST['titulo'])) {
+    //Já clicou no Enviar
+    $titulo = trim($_POST['titulo']);
+    $autor = trim($_POST['autor']);
+    $genero = trim($_POST['genero']);
+    $numPaginas = trim($_POST['numPaginas']);
 
-    /*echo $titulo . '<br><br>';
-    echo $genero . '<br><br>';
-    echo $numPaginas;*/
+    //echo $titulo . " - " . $genero . "- " . $numPaginas;
 
-    $livro = array(
-        "id" => uniqid(),
-        "titulo" => $titulo,
-        "genero" => $genero,
-        "paginas" => $numPaginas
-    );
+    //Validar os dados 
+    $erros = array();
 
-    array_push($livros, $livro);
 
-    salvarDados($livros, "livros.json");
+    if ($titulo == '') {
+        array_push($erros, "Informe o título!");
+    } else if (strlen($titulo) <= 3) {
+        array_push($erros, "Informe um título com mais de 3 caracteres!!!");
+    }
+    if ($autor == '') {
+        array_push($erros, "Informe o autor!!");
+    }
+    if ($genero == '') {
+        array_push($erros, "Informe o genero!");
+    }
+    if ($numPaginas == '') {
+        array_push($erros, "Informe o número de páginas!");
+    } else if (strlen($numPaginas) <= 0) {
+        array_push($erros, "O número de páginas deve ser maior que 0!");
+    }
+    if (empty($erros)) {
+        $livro = array(
+            "id" => uniqid(),
+            "autor" => $autor,
+            "titulo" => $titulo,
+            "genero" => $genero,
+            "paginas" => $numPaginas
+        );
 
-    //Força o recarregamento para evitar o reenvio do formulário
-    header("location: livros.php");
+        array_push($livros, $livro);
+        salvarDados($livros, "livros.json");
 
+        //Forçar o recarremento para evitar o reenvio do form
+        header("location: livros.php");
+    } else {
+        $msgErro = implode("<br>", $erros);
+    }
 }
 
 ?>
@@ -40,63 +68,75 @@ if (isset($_POST["titulo"])){
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de livros</title>
 </head>
+
 <body>
 
-<h1>Cadastro de livros</h1>
+    <h1>Cadastro de livros</h1>
 
-<h3>Cadastre seu livro aqui</h3>
-<form method='POST'>
-    <input type="text" name='titulo' placeholder="Informe o título" />
-    <br><br> 
+    <h3>Cadastre seu livro aqui</h3>
+    <!--<form method='POST' onsubmit="return validar();">-->
+    <form method='POST'>
+        <input type="text" name='titulo' id="titulo" placeholder="Informe o título" value="<?= $titulo ?>" />
+        <br><br>
+        <input type="text" name="autor" placeholder="Informe o autor" value="<?= $autor ?>">
+        <br><br>
 
-    <select name="genero">
-        <option value="">--Selecione o gênero--</option>
-        <option value="D">Drama</option>
-        <option value="F">Ficção</option>
-        <option value="R">Romance</option>
-        <option value="O">Outro</option>
-    </select>
-    <br><br>
+        <select name="genero" id="genero">
+            <option value="">--Selecione o gênero--</option>
+            <option value="D" <?= $genero == "D" ? 'selected' : '' ?>>Drama</option>
+            <option value="F" <?= $genero == "F" ? 'selected' : '' ?>>Ficção</option>
+            <option value="R" <?= $genero == "R" ? 'selected' : '' ?>>Romance</option>
+            <option value="O" <?= $genero == "O" ? 'selected' : '' ?>>Outro</option>
+        </select>
+        <br><br>
 
-    <input type="number" name="numPaginas" placeholder="Informe o número de páginas">
-    <br><br>
+        <input type="number" name="numPaginas" placeholder="Informe o número de páginas" value="<?= $numPaginas ?>">
+        <br><br>
 
-    <input type="submit" value="Enviar" />
-</form>
+        <input type="submit" value="Enviar" />
+    </form>
 
-<h3>Livros cadastrados</h3>
+    <div id="divErro" style="color: red;"><?= $msgErro ?></div>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Título</th>
-        <th>Gênero</th>
-        <th>Quant. Páginas</th>
-        <th>Excluir</th>
-    </tr>
 
-    <?php foreach($livros as $l): ?>
+    <h3>Livros cadastrados</h3>
+
+    <table border="1">
         <tr>
-            <td><?php echo $l['id'] ?></td>
-            <td><?= $l['titulo'] ?></td>
-            <td><?= $l['genero'] ?></td>
-            <td><?= $l['paginas'] ?></td>
-            <td>
-                <a href="excluir.php?id=<?= $l['id']?>"
-                onclick="return confirm('Confirma a exclusão?')"
-                >Excluir</a>
-            </td>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Gênero</th>
+            <th>Quant. Páginas</th>
+            <th>Excluir</th>
         </tr>
 
-    <?php endforeach; ?>
+        <?php foreach ($livros as $l): ?>
+            <tr>
+                <td><?php echo $l['id'] ?></td>
+                <td><?= $l['titulo'] ?></td>
+                <td><?= $l['autor'] ?></td>
+                <td><?= $l['genero'] ?></td>
+                <td><?= $l['paginas'] ?></td>
+                <td>
+                    <a href="excluir.php?id=<?= $l['id'] ?>"
+                        onclick="return confirm('Confirma a exclusão?')">Excluir</a>
+                </td>
+            </tr>
 
-</table>
+        <?php endforeach; ?>
+
+    </table>
+
+    <script src="validacao.js"></script>
 
 </body>
+
 </html>
