@@ -27,7 +27,8 @@ class Connection
                 self::$conn = new PDO(
                     "mysql:host=localhost;dbname=db_times",
                     "root",
-                    "bancodedados"
+                    "bancodedados",
+                    $opcoes
                 );
             } catch (PDOException $e) {
                 echo "Erro";
